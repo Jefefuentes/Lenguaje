@@ -1,0 +1,194 @@
+import React, { useState, useEffect } from 'react';
+
+// The flashcard data extracted from the provided document
+const flashcardData = [
+  {
+    name: "Antítesis",
+    definition: "Consiste en la contraposición de dos ideas o palabras de significado opuesto.",
+    example: '"Es tan corto el amor y tan largo el olvido."'
+  },
+  {
+    name: "Hipérbole",
+    definition: "Exageración desmedida de un hecho o cualidad.",
+    example: '"Te lo he dicho un millón de veces."'
+  },
+  {
+    name: "Prosopopeya o Personificación",
+    definition: "Atribuye cualidades o acciones humanas a objetos inanimados o animales.",
+    example: '"El viento susurraba secretos."'
+  },
+  {
+    name: "Símil o Comparación",
+    definition: "Establece una semejanza explícita entre dos elementos usando nexos como 'como', 'cual', 'parece', etc.",
+    example: '"Sus ojos son como dos luceros."'
+  },
+  {
+    name: "Anáfora",
+    definition: "Repetición de una o varias palabras al principio de versos o frases.",
+    example: '"Salid a la ventana, salid a la azotea, salid al balcón."'
+  },
+  {
+    name: "Aliteración",
+    definition: "Repetición de un mismo sonido en un verso o frase para lograr un efecto musical.",
+    example: '"En el silencio solo se escuchaba un susurro de abejas que sonaba."'
+  },
+  {
+    name: "Asíndeton",
+    definition: "Omisión de conjunciones (como 'y', 'o', 'ni') para dar rapidez y dinamismo.",
+    example: '"Llegué, vi, vencí."'
+  },
+  {
+    name: "Hipérbaton",
+    definition: "Alteración del orden gramatical normal de las palabras en una oración.",
+    example: '"Del salón en el ángulo oscuro, de su dueña tal vez olvidada, silenciosa y cubierta de polvo, veíase el arpa."'
+  },
+  {
+    name: "Metáfora",
+    definition: "Identificación de un término real con otro imaginario con el que tiene una semejanza, sin usar nexos de comparación.",
+    example: '"Tus cabellos de oro."'
+  },
+  {
+    name: "Metonimia",
+    definition: "Sustitución de un término por otro con el que guarda una relación de contigüidad o proximidad.",
+    example: '"Leer a Cervantes." (Se refiere a las obras de Cervantes).'
+  },
+  {
+    name: "Sinécdoque",
+    definition: "Designa la parte por el todo, o el todo por la parte.",
+    example: '"Tiene veinte cabezas de ganado." (Se refiere a veinte animales enteros).'
+  }
+];
+
+// Shuffle the array of flashcards
+const shuffleCards = (array) => {
+    let newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+};
+
+const App = () => {
+    const [cards, setCards] = useState([]);
+    const [currentCardIndex, setCurrentCardIndex] = useState(0);
+    const [isFlipped, setIsFlipped] = useState(false);
+    const [showInstructions, setShowInstructions] = useState(true);
+
+    // Initial load and shuffle
+    useEffect(() => {
+        setCards(shuffleCards(flashcardData));
+    }, []);
+
+    // Function to navigate to the next card
+    const handleNextCard = () => {
+        setIsFlipped(false);
+        if (currentCardIndex < cards.length - 1) {
+            setCurrentCardIndex(currentCardIndex + 1);
+        }
+    };
+
+    // Function to navigate to the previous card
+    const handlePrevCard = () => {
+        setIsFlipped(false);
+        if (currentCardIndex > 0) {
+            setCurrentCardIndex(currentCardIndex - 1);
+        }
+    };
+
+    // Function to flip the card
+    const handleFlipCard = () => {
+        setIsFlipped(!isFlipped);
+    };
+
+    // Function to reset and shuffle
+    const handleReset = () => {
+        setIsFlipped(false);
+        setCurrentCardIndex(0);
+        setCards(shuffleCards(flashcardData));
+    };
+
+    // Get the current card data
+    const currentCard = cards[currentCardIndex];
+    if (!currentCard) {
+        return <div className="text-center p-8">Cargando tarjetas...</div>;
+    }
+
+    return (
+        <div className="bg-gray-100 min-h-screen p-8 font-sans flex flex-col items-center justify-center">
+            {showInstructions ? (
+                <div className="w-full max-w-xl p-8 bg-white rounded-2xl shadow-xl text-center">
+                    <h2 className="text-2xl font-bold text-indigo-700 mb-4">¡Bienvenido al Modo Flashcards!</h2>
+                    <p className="text-gray-600 mb-6">
+                        Aquí puedes estudiar las figuras literarias una por una. Haz clic en la tarjeta para ver su definición y ejemplo. Puedes usar los botones de navegación para avanzar o retroceder.
+                    </p>
+                    <button
+                        onClick={() => setShowInstructions(false)}
+                        className="px-6 py-3 rounded-full font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors duration-200"
+                    >
+                        Empezar
+                    </button>
+                </div>
+            ) : (
+                <>
+                    <h1 className="text-3xl md:text-4xl font-bold text-indigo-700 mb-8 text-center">Flashcards de Figuras Literarias</h1>
+                    
+                    <div className="text-center mb-4 text-gray-500">
+                        Tarjeta {currentCardIndex + 1} de {cards.length}
+                    </div>
+
+                    <div
+                        onClick={handleFlipCard}
+                        className="w-full max-w-xl h-96 bg-white rounded-2xl shadow-xl border border-gray-200 cursor-pointer p-8 flex flex-col items-center justify-center text-center transform transition-all duration-500 [transform-style:preserve-3d] hover:scale-105"
+                    >
+                        <div className={`w-full h-full flex flex-col items-center justify-center transition-opacity duration-300 ${isFlipped ? 'opacity-0 absolute' : 'opacity-100'}`}>
+                            <p className="text-2xl font-bold text-indigo-600">
+                                {currentCard.name}
+                            </p>
+                            <p className="mt-4 text-gray-500 italic">
+                                (Haz clic para ver la definición)
+                            </p>
+                        </div>
+                        
+                        <div className={`w-full h-full flex flex-col items-center justify-center transition-opacity duration-300 [transform:rotateY(180deg)] ${isFlipped ? 'opacity-100 absolute' : 'opacity-0'}`}>
+                            <div className="text-left space-y-4 px-4">
+                                <p className="text-base text-gray-700">
+                                    <strong className="font-semibold text-gray-900">Definición:</strong> {currentCard.definition}
+                                </p>
+                                <p className="text-base text-gray-700">
+                                    <strong className="font-semibold text-gray-900">Ejemplo:</strong> {currentCard.example}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-center gap-4 mt-8">
+                        <button
+                            onClick={handlePrevCard}
+                            disabled={currentCardIndex === 0}
+                            className="px-6 py-3 rounded-full font-bold bg-gray-300 text-gray-800 hover:bg-gray-400 disabled:opacity-50 transition-colors duration-200"
+                        >
+                            &larr; Anterior
+                        </button>
+                        <button
+                            onClick={handleNextCard}
+                            disabled={currentCardIndex === cards.length - 1}
+                            className="px-6 py-3 rounded-full font-bold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors duration-200"
+                        >
+                            Siguiente &rarr;
+                        </button>
+                    </div>
+
+                    <button
+                        onClick={handleReset}
+                        className="mt-4 px-6 py-3 rounded-full font-bold text-sm text-gray-600 hover:text-indigo-700 transition-colors duration-200"
+                    >
+                        Barajar y Reiniciar
+                    </button>
+                </>
+            )}
+        </div>
+    );
+};
+
+export default App;
